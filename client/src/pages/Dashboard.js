@@ -58,10 +58,6 @@ const Dashboard = () => {
 
   const currentUser = JSON.parse(localStorage.getItem("currentUserData")).user;
 
-  const [shouldOpenLink, setShouldOpenLink] = useState(false);
-
-  const [whatsappUrl, setWhatsappUrl] = useState("");
-
   async function populateQuote() {
     const data = await fetch("http://localhost:1337/api/quote", {
       method: "GET",
@@ -94,11 +90,17 @@ const Dashboard = () => {
     } else {
       navigate("/login");
     }
-  }, []);
+  }, [navigate]);
 
   async function createQuote(event) {
     event.preventDefault();
     const newQuote = tempQuote.trim();
+
+    // Check if the new quote is blank
+    if (!newQuote) {
+      alert("Please enter a non-blank quote.");
+      return;
+    }
 
     // Check if the new quote already exists
     if (quotes.includes(newQuote)) {
@@ -230,7 +232,7 @@ const Dashboard = () => {
     }
 
     fetchUsers();
-  }, []);
+  }, [currentUserEmail]);
 
   async function fetchUserQuotes(user) {
     const data = await fetch(`http://localhost:1337/api/quote/${user.email}`, {
@@ -280,9 +282,14 @@ const Dashboard = () => {
       // Check the flag before redirecting
       if (newWindow) {
         // Reset the WhatsApp URL
-        setWhatsappUrl("");
+        // setWhatsappUrl("");
       }
     }
+  };
+
+  const handleEdit = () => {
+    console.log("edit profile");
+    navigate("/editprofile");
   };
 
   return (
@@ -313,9 +320,10 @@ const Dashboard = () => {
           {openDropDown && (
             <div className="logout">
               <ul>
-                <li ref={btnRef} colorScheme="teal" onClick={onOpen}>
+                <li ref={btnRef} onClick={onOpen}>
                   Other Users
                 </li>
+                <li onClick={handleEdit}>Edit Profile</li>
                 <li onClick={(() => setOpenDropDown(false), handleLogout)}>
                   Logout
                 </li>

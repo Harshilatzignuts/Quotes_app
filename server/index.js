@@ -94,6 +94,45 @@ app.post("/api/login", async (req, res) => {
     });
   }
 });
+app.put("/api/updateProfile", async (req, res) => {
+  const token = jwt.sign(
+    {
+      name: req.body.name,
+      email: req.body.email,
+    },
+    "secret123"
+  );
+
+  try {
+    const decoded = jwt.verify(token, "secret123");
+
+    // Assuming your user model is called 'User'
+    await User.updateOne(
+      { email: decoded.email },
+      {
+        $set: {
+          name: req.body.name,
+          email: req.body.email,
+        },
+      }
+    );
+
+    return res.json({
+      status: "ok",
+      user: {
+        name: req.body.name,
+        email: req.body.email,
+        token: token,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: "error",
+      error: "Failed to update profile",
+    });
+  }
+});
 
 app.get("/api/users", async (req, res) => {
   try {
